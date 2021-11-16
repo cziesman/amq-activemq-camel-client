@@ -1,0 +1,1 @@
+# amq-activemq-camel-client
