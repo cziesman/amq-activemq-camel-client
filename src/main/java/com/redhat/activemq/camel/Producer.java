@@ -1,10 +1,9 @@
 package com.redhat.activemq.camel;
 
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,19 +11,12 @@ public class Producer {
 
     private static final Logger LOG = LoggerFactory.getLogger(Producer.class);
 
-    @Value("${destination.name}")
-    private String destinationName;
-
-    @Autowired
-    public JmsTemplate jmsTemplate;
+    @Produce("{{from.endpoint}}")
+    private ProducerTemplate producer;
 
     public void sendMessage(String payload) {
 
-        try {
-            jmsTemplate.convertAndSend(destinationName, payload);
-        } catch (Throwable t) {
-            LOG.error(t.getMessage(), t);
-        }
+        producer.sendBody(payload);
     }
 
 }

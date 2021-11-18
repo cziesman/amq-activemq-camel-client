@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -44,7 +45,7 @@ public class JmsConfig {
     private String verifyHostName;
 
     @Bean
-    public JmsComponent jmsComponent(PooledConnectionFactory pooledConnectionFactory) {
+    public JmsComponent jmsComponent(CachingConnectionFactory pooledConnectionFactory) {
 
         JmsComponent jms = new JmsComponent();
         jms.setConnectionFactory(pooledConnectionFactory);
@@ -53,13 +54,14 @@ public class JmsConfig {
     }
 
     @Bean
-    public PooledConnectionFactory pooledConnectionFactory() throws Exception {
+    public CachingConnectionFactory cachingConnectionFactory() throws Exception {
 
-        final PooledConnectionFactory pooledConnectionFactory = new PooledConnectionFactory();
-        pooledConnectionFactory.setMaxConnections(brokerMaxConnections);
-        pooledConnectionFactory.setConnectionFactory(connectionFactory());
+        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory();
+        cachingConnectionFactory.setSessionCacheSize(brokerMaxConnections);
+        cachingConnectionFactory.setTargetConnectionFactory(connectionFactory());
+        cachingConnectionFactory.afterPropertiesSet();
 
-        return pooledConnectionFactory;
+        return cachingConnectionFactory;
     }
 
     protected ActiveMQSslConnectionFactory connectionFactory() throws Exception {
@@ -85,6 +87,6 @@ public class JmsConfig {
 
         LOG.debug(uriComponents.toUriString());
 
-        return uriComponents.toUriString();
+        return String.format("failover:(%s)", uriComponents.toUriString());
     }
 }
