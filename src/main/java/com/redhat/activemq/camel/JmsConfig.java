@@ -1,7 +1,6 @@
 package com.redhat.activemq.camel;
 
 import org.apache.activemq.ActiveMQSslConnectionFactory;
-import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.camel.component.jms.JmsComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,10 +44,10 @@ public class JmsConfig {
     private String verifyHostName;
 
     @Bean
-    public JmsComponent jmsComponent(CachingConnectionFactory pooledConnectionFactory) {
+    public JmsComponent jmsComponent(CachingConnectionFactory cachingConnectionFactory) {
 
         JmsComponent jms = new JmsComponent();
-        jms.setConnectionFactory(pooledConnectionFactory);
+        jms.setConnectionFactory(cachingConnectionFactory);
 
         return jms;
     }
@@ -57,7 +56,6 @@ public class JmsConfig {
     public CachingConnectionFactory cachingConnectionFactory() throws Exception {
 
         CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory();
-        cachingConnectionFactory.setSessionCacheSize(brokerMaxConnections);
         cachingConnectionFactory.setTargetConnectionFactory(connectionFactory());
         cachingConnectionFactory.afterPropertiesSet();
 

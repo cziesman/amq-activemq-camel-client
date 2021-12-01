@@ -11,7 +11,7 @@ public class Producer {
 
     private static final Logger LOG = LoggerFactory.getLogger(Producer.class);
 
-    @Produce("{{from.endpoint}}")
+    @Produce("{{jms.endpoint}}")
     private ProducerTemplate producer;
 
     public void sendMessage(String payload) {
